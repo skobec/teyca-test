@@ -1,0 +1,12 @@
+{
+  "/api": {
+    "target": "https://api.teyca.ru",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": { "^/api": "" },
+    "logLevel": "debug",
+    "onProxyReq": {
+      "logLevel": "debug"
+    }
+  }
+}

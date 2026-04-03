@@ -20,6 +20,13 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
+            "baseHref": "/teyca-test/",
+            "deploy": {
+              "builder": "angular-cli-ghpages:deploy"
+            },
+            "polyfills": [
+              "zone.js"
+            ],
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
@@ -27,7 +34,8 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              }
+              },
+              "src/assets"
             ],
             "styles": [
               "src/styles.scss"
@@ -59,6 +67,9 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "proxyConfig": "proxy.conf.json"
+          },
           "configurations": {
             "production": {
               "buildTarget": "teyca-test:build:production"

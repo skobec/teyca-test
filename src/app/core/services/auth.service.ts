@@ -1,22 +1,35 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, tap } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private KEY = 'token';
+  private readonly http = inject(HttpClient);
+  private readonly AUTH_URL = 'https://api.teyca.ru/test-auth-only';
 
-  setToken(token: string) {
-    localStorage.setItem(this.KEY, token);
+  readonly token = signal<string | null>(localStorage.getItem('auth_token'));
+
+  login(login: string, password: string): Observable<{ auth_token: string }> {
+    return this.http.post<{ auth_token: string }>(this.AUTH_URL, { login, password }).pipe(
+      tap(res => {
+        this.token.set(res.auth_token);
+        localStorage.setItem('auth_token', res.auth_token);
+      })
+    );
   }
 
-  getToken() {
-    return localStorage.getItem(this.KEY);
+  logout(): void {
+    this.token.set(null);
+    localStorage.removeItem('auth_token');
   }
 
-  isAuth() {
-    return !!this.getToken();
+  api(endpoint: string): string {
+    const t = this.token();
+    if (!t) throw new Error('No token');
+    return `https://api.teyca.ru/v1/${t}/${endpoint}`;
   }
 
-  logout() {
-    localStorage.removeItem(this.KEY);
+  isAuthenticated(): boolean {
+    return !!this.token();
   }
 }

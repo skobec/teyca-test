@@ -1,0 +1,82 @@
+<div class="push-modal">
+  <div class="modal-header">
+    <h2>Новая Push-рассылка</h2>
+    <button mat-icon-button (click)="onCancel()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <form [formGroup]="pushForm" (ngSubmit)="onSubmit()">
+    <div class="modal-content">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Текст сообщения</mat-label>
+        <textarea
+          matInput
+          formControlName="message"
+          placeholder="Введите текст сообщения..."
+          rows="4"
+        ></textarea>
+        <mat-hint align="end">{{ getMessageLength() }} / 200</mat-hint>
+        @if (pushForm.controls.message.hasError('required') && pushForm.controls.message.touched) {
+          <mat-error>Введите текст сообщения</mat-error>
+        }
+        @if (pushForm.controls.message.hasError('minlength') && pushForm.controls.message.touched) {
+          <mat-error>Минимум 5 символов</mat-error>
+        }
+      </mat-form-field>
+
+      <div class="preview-section">
+        <label class="preview-label">Превью</label>
+        <div class="preview-card">
+          <div class="preview-header">
+            <div class="app-icon">📱</div>
+            <div class="preview-info">
+              <div class="sender-name">Имя отправителя</div>
+              <div class="message-preview">
+                {{ pushForm.controls.message.value || 'Текст сообщения появится здесь...' }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Дата отправки рассылки</mat-label>
+        <mat-select formControlName="sendType">
+          <mat-option value="instant">Сейчас</mat-option>
+          <mat-option value="scheduled">По расписанию</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      @if (pushForm.value.sendType === 'scheduled') {
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Выберите дату и время</mat-label>
+          <input
+            matInput
+            [matDatepicker]="picker"
+            formControlName="sendDate"
+            placeholder="ДД.ММ.ГГГГ ЧЧ:ММ"
+          >
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+      }
+
+      <div class="recipients-info">
+        <mat-icon>people</mat-icon>
+        <span>Получателей: <strong>{{ totalSelected }}</strong></span>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button mat-button type="button" (click)="onCancel()">Отмена</button>
+      <button
+        mat-flat-button
+        type="submit"
+        [disabled]="pushForm.invalid"
+      >
+        Отправить
+      </button>
+    </div>
+  </form>
+</div>
