@@ -14,10 +14,17 @@ import { Client } from '../../core/models/client.models';
 import { SendPushModalComponent } from '../push/send-push-modal/send-push-modal.component';
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
+import { MatPaginatorIntl } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-clients',
   standalone: true,
+  providers: [
+    {
+      provide: MatPaginatorIntl,
+      useValue: getRussianPaginatorIntl()
+    }
+  ],
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -33,6 +40,8 @@ import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
   templateUrl: './clients.component.html',
   styleUrls: ['./clients.component.scss']
 })
+
+
 export class ClientsComponent implements OnInit {
   private readonly destroy$ = new Subject<void>();
   private readonly clientsService = inject(ClientsService);
@@ -186,4 +195,22 @@ export class ClientsComponent implements OnInit {
       day: '2-digit', month: '2-digit', year: 'numeric'
     });
   }
+}
+
+function getRussianPaginatorIntl(): MatPaginatorIntl {
+  const paginatorIntl = new MatPaginatorIntl();
+  paginatorIntl.itemsPerPageLabel = 'Элементов на странице:';
+  paginatorIntl.nextPageLabel = 'Следующая';
+  paginatorIntl.previousPageLabel = 'Предыдущая';
+  paginatorIntl.firstPageLabel = 'В начало';
+  paginatorIntl.lastPageLabel = 'В конец';
+  paginatorIntl.getRangeLabel = (page: number, pageSize: number, length: number) => {
+    if (length === 0 || pageSize === 0) return `0 из ${length}`;
+    const startIndex = page * pageSize;
+    const endIndex = startIndex < length
+      ? Math.min(startIndex + pageSize, length)
+      : startIndex + pageSize;
+    return `${startIndex + 1} – ${endIndex} из ${length}`;
+  };
+  return paginatorIntl;
 }
